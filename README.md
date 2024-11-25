@@ -1,54 +1,149 @@
-# Orchestrata Crew
+# DynamoDB Query and Scan Workflow Notebook
 
-Welcome to the Orchestrata Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+This Jupyter Notebook demonstrates a workflow for dynamically querying and scanning DynamoDB tables. The workflow uses a multi-agent system powered by **LangGraph** and **LangChain** tools, enabling the handling of user queries to interact with DynamoDB.
 
-## Installation
+---
 
-Ensure you have Python >=3.10 <=3.13 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
+## Features
 
-First, if you haven't already, install uv:
+1. **List Tables**: Retrieve a list of all DynamoDB tables in your AWS account.
+2. **Get Table Schema**: Fetch metadata and schema details of a specific DynamoDB table.
+3. **Query DynamoDB**: Perform key-based queries to retrieve specific items from a DynamoDB table.
+4. **Scan DynamoDB**: Retrieve all items from a table when no specific condition is provided.
+5. **Dynamic Decision Making**: Agents intelligently decide which operation to perform based on user input.
 
+---
+
+## Prerequisites
+
+### Software Requirements
+
+- **Python 3.11** (managed using Conda)
+- **IAM ROLE with DynamoDB Full Access Attached to EC2 instance**
+
+---
+
+## Environment Setup
+
+### Step 1: Create a Conda Environment for Python 3.11
+
+1. Open a terminal and run the following command to create a conda environment with Python 3.11:
+   ```bash
+   conda create -n dynamodb_env python=3.11 -y
+   ```
+
+2. Activate the environment:
+   ```bash
+   conda activate dynamodb_env
+   ```
+
+3. Install essential packages for Jupyter:
+   ```bash
+   conda install -c conda-forge notebook -y
+   ```
+
+### Step 2: Install Required Python Libraries
+
+Install the libraries needed for this project:
 ```bash
-pip install uv
+pip install langchain langgraph boto3
 ```
 
-Next, navigate to your project directory and install the dependencies:
+### Step 3: Verify AWS Configuration
 
-(Optional) Lock the dependencies and install them by using the CLI command:
+Ensure that the AWS CLI is configured with valid credentials:
 ```bash
-crewai install
-```
-### Customizing
-
-**Add your `OPENAI_API_KEY` into the `.env` file**
-
-- Modify `src/orchestrata/config/agents.yaml` to define your agents
-- Modify `src/orchestrata/config/tasks.yaml` to define your tasks
-- Modify `src/orchestrata/crew.py` to add your own logic, tools and specific args
-- Modify `src/orchestrata/main.py` to add custom inputs for your agents and tasks
-
-## Running the Project
-
-To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
-
-```bash
-$ crewai run
+aws configure
 ```
 
-This command initializes the orchestrata Crew, assembling the agents and assigning them tasks as defined in your configuration.
+If the AWS CLI is not installed, follow the [AWS CLI installation guide](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html).
 
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
+---
 
-## Understanding Your Crew
+## Usage
 
-The orchestrata Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
+### Running the Notebook
 
-## Support
+1. Activate the conda environment:
+   ```bash
+   conda activate dynamodb_env
+   ```
 
-For support, questions, or feedback regarding the Orchestrata Crew or crewAI.
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
+2. Launch Jupyter Notebook:
+   ```bash
+   jupyter notebook dynamodb_workflow.ipynb
+   ```
 
-Let's create wonders together with the power and simplicity of crewAI.
+3. Run each cell sequentially in the notebook.
+
+4. Provide input queries:
+   - Query with a condition: `"Query the 'Orders' table where 'OrderID' equals '123'"`
+   - Scan a table: `"Retrieve all data from the 'Orders' table"`
+
+5. View the results directly in the notebook.
+
+---
+
+## Examples
+
+### **Query Data from DynamoDB**
+
+**Input**:
+
+```plaintext
+"Query the 'Orders' table where 'OrderID' equals '123'"
+```
+
+**Output**:
+```json
+{
+    "success": True,
+    "data": [
+        {
+            "OrderID": {"S": "123"},
+            "CustomerName": {"S": "John Doe"},
+            "OrderDate": {"S": "2023-12-01"}
+        }
+    ]
+}
+```
+
+---
+
+### **Scan a DynamoDB Table**
+**Input**:
+```plaintext
+"Retrieve all data from the 'Orders' table"
+```
+
+**Output**:
+```{json}
+{
+    "success": True,
+    "data": [
+        {
+            "OrderID": {"S": "123"},
+            "CustomerName": {"S": "John Doe"},
+            "OrderDate": {"S": "2023-12-01"}
+        },
+        {
+            "OrderID": {"S": "124"},
+            "CustomerName": {"S": "Jane Smith"},
+            "OrderDate": {"S": "2023-12-02"}
+        }
+    ]
+}
+```
+
+## Customization
+
+You can extend this notebook to:
+- Add more DynamoDB operations (e.g., updates, deletes).
+- Integrate with other AWS services.
+- Enhance query parsing with NLP for more natural input handling.
+
+---
+
+## License
+
+This project is licensed under the MIT License.
